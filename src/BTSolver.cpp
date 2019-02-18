@@ -215,9 +215,52 @@ vector<int> BTSolver::getValuesInOrder ( Variable* v )
  * Return: A list of v's domain sorted by the LCV heuristic
  *         The LCV is first and the MCV is last
  */
+bool sortBySecondItem(const pair<int,int> &a, const pair<int,int> &b) 
+{ 
+    return (a.second < b.second); 
+} 
+
 vector<int> BTSolver::getValuesLCVOrder ( Variable* v )
 {
-	return vector<int>();
+	vector<int> valuesInOrder = getValuesInOrder(v);
+	vector<pair<int,int>> counts(valuesInOrder.size());
+	vector<int> sortedValues(valuesInOrder.size());
+
+	// Initialize the vector of pairs so it will become <value, count> i.e <1,4> and <2, 11>
+	for(int i = 0; i < valuesInOrder.size(); i++)
+	{
+		counts[i].first = valuesInOrder[i];
+		counts[i].second = 0;
+	}
+
+	// For every value in our board find every variable if its touching and increment its count
+	for(int i = 0; i < valuesInOrder.size(); i++)
+	{
+		for(Variable * v1: network.getNeighborsOfVariable(v))
+		{
+			if(v1->getDomain().contains(valuesInOrder[i]))
+			{
+				counts[i].second++;
+			}
+		}
+	}
+
+	sort(counts.begin(), counts.end(), sortBySecondItem);
+
+	// Debugging code to print the vector 
+	// for(int i = 0; i < counts.size(); i++)
+	// {
+	//     cout << counts[i].first << ": " << counts[i].second << "| "; 
+	// }
+	// cout << endl;
+
+	// Since we need to return a single int array of the numbers put them in the return vector and disregard the counts for the return vector
+	for(int i = 0; i < counts.size(); i++)
+	{
+		sortedValues[i] = counts[i].first;
+	}
+
+	return sortedValues;
 }
 
 /**
