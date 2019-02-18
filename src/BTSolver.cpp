@@ -143,11 +143,13 @@ Variable* BTSolver::getfirstUnassignedVariable ( void )
 Variable* BTSolver::getMRV ( void )
 {
 	Variable * mrv = getfirstUnassignedVariable();
+
+	// If there are no unassigned variables, then no work should be done.
 	if (mrv == nullptr)
 		return nullptr;
 	else
 	{
-		// Minimum Domain Count In MRV
+		// Current minimum domain count in MRV.
 		int minSize = mrv->size();
 
 		for (Variable * var : network.getVariables())
@@ -156,8 +158,11 @@ Variable* BTSolver::getMRV ( void )
 			{
 				if (var->size() == minSize || var->size() < minSize)
 				{
-					mrv = var;
+					// Found new minimum
 					minSize = var->size();
+
+					// Setting the new mrv to be the minimum var
+					mrv = var;
 				}
 			}
 		}
