@@ -1,4 +1,4 @@
-#include"BTSolver.hpp"
+#include "BTSolver.hpp"
 
 using namespace std;
 
@@ -6,12 +6,12 @@ using namespace std;
 // Constructors
 // =====================================================================
 
-BTSolver::BTSolver ( SudokuBoard input, Trail* _trail,  string val_sh, string var_sh, string cc )
-: sudokuGrid( input.get_p(), input.get_q(), input.get_board() ), network( input )
+BTSolver::BTSolver(SudokuBoard input, Trail *_trail, string val_sh, string var_sh, string cc)
+	: sudokuGrid(input.get_p(), input.get_q(), input.get_board()), network(input)
 {
 	valHeuristics = val_sh;
 	varHeuristics = var_sh;
-	cChecks =  cc;
+	cChecks = cc;
 
 	trail = _trail;
 }
@@ -21,10 +21,10 @@ BTSolver::BTSolver ( SudokuBoard input, Trail* _trail,  string val_sh, string va
 // =====================================================================
 
 // Basic consistency check, no propagation done
-bool BTSolver::assignmentsCheck ( void )
+bool BTSolver::assignmentsCheck(void)
 {
-	for ( Constraint c : network.getConstraints() )
-		if ( ! c.isConsistent() )
+	for (Constraint c : network.getConstraints())
+		if (!c.isConsistent())
 			return false;
 
 	return true;
@@ -42,7 +42,7 @@ bool BTSolver::assignmentsCheck ( void )
  * Note: remember to trail.push variables before you change their domain
  * Return: true is assignment is consistent, false otherwise
  */
-bool BTSolver::forwardChecking ( void )
+bool BTSolver::forwardChecking(void)
 {
 	int numChanges = 0;
 	do
@@ -73,10 +73,10 @@ bool BTSolver::forwardChecking ( void )
 	} while (numChanges == 0);
 
 	// Debugging code for checking the domain of all the variables
-	for (Variable *v : network.getVariables())
-	{
-		cout << v->toString() << endl;
-	}
+	// for (Variable *v : network.getVariables())
+	// {
+	// 	cout << v->toString() << endl;
+	// }
 
 	// Go through the board to make sure it's consistent and there aren't any empty squares
 	for (Variable *v : network.getVariables())
@@ -104,7 +104,7 @@ bool BTSolver::forwardChecking ( void )
  * Note: remember to trail.push variables before you change their domain
  * Return: true is assignment is consistent, false otherwise
  */
-bool BTSolver::norvigCheck ( void )
+bool BTSolver::norvigCheck(void)
 {
 	return false;
 }
@@ -115,7 +115,7 @@ bool BTSolver::norvigCheck ( void )
  * Completing the three tourn heuristic will automatically enter
  * your program into a tournament.
  */
-bool BTSolver::getTournCC ( void )
+bool BTSolver::getTournCC(void)
 {
 	return false;
 }
@@ -125,10 +125,10 @@ bool BTSolver::getTournCC ( void )
 // =====================================================================
 
 // Basic variable selector, returns first unassigned variable
-Variable* BTSolver::getfirstUnassignedVariable ( void )
+Variable *BTSolver::getfirstUnassignedVariable(void)
 {
-	for ( Variable* v : network.getVariables() )
-		if ( !(v->isAssigned()) )
+	for (Variable *v : network.getVariables())
+		if (!(v->isAssigned()))
 			return v;
 
 	// Everything is assigned
@@ -140,9 +140,9 @@ Variable* BTSolver::getfirstUnassignedVariable ( void )
  *
  * Return: The unassigned variable with the smallest domain
  */
-Variable* BTSolver::getMRV ( void )
+Variable *BTSolver::getMRV(void)
 {
-	Variable * mrv = getfirstUnassignedVariable();
+	Variable *mrv = getfirstUnassignedVariable();
 
 	// If there are no unassigned variables, then no work should be done.
 	if (mrv == nullptr)
@@ -152,7 +152,7 @@ Variable* BTSolver::getMRV ( void )
 		// Current minimum domain count in MRV.
 		int minSize = mrv->size();
 
-		for (Variable * var : network.getVariables())
+		for (Variable *var : network.getVariables())
 		{
 			if (var->isAssigned() == false)
 			{
@@ -178,7 +178,7 @@ Variable* BTSolver::getMRV ( void )
  * Return: The unassigned variable with the smallest domain and involved
  *             in the most constraints
  */
-Variable* BTSolver::MRVwithTieBreaker ( void )
+Variable *BTSolver::MRVwithTieBreaker(void)
 {
 	return nullptr;
 }
@@ -189,7 +189,7 @@ Variable* BTSolver::MRVwithTieBreaker ( void )
  * Completing the three tourn heuristic will automatically enter
  * your program into a tournament.
  */
-Variable* BTSolver::getTournVar ( void )
+Variable *BTSolver::getTournVar(void)
 {
 	return nullptr;
 }
@@ -199,10 +199,10 @@ Variable* BTSolver::getTournVar ( void )
 // =====================================================================
 
 // Default Value Ordering
-vector<int> BTSolver::getValuesInOrder ( Variable* v )
+vector<int> BTSolver::getValuesInOrder(Variable *v)
 {
 	vector<int> values = v->getDomain().getValues();
-	sort( values.begin(), values.end() );
+	sort(values.begin(), values.end());
 	return values;
 }
 
@@ -215,30 +215,32 @@ vector<int> BTSolver::getValuesInOrder ( Variable* v )
  * Return: A list of v's domain sorted by the LCV heuristic
  *         The LCV is first and the MCV is last
  */
-bool sortBySecondItem(const pair<int,int> &a, const pair<int,int> &b) 
-{ 
-    return (a.second < b.second); 
-} 
 
-vector<int> BTSolver::getValuesLCVOrder ( Variable* v )
+// Comparator for our pair to sort based on the second item in the pair
+bool sortBySecondItem(const pair<int, int> &a, const pair<int, int> &b)
+{
+	return (a.second < b.second);
+}
+
+vector<int> BTSolver::getValuesLCVOrder(Variable *v)
 {
 	vector<int> valuesInOrder = getValuesInOrder(v);
-	vector<pair<int,int>> counts(valuesInOrder.size());
+	vector<pair<int, int>> counts(valuesInOrder.size());
 	vector<int> sortedValues(valuesInOrder.size());
 
 	// Initialize the vector of pairs so it will become <value, count> i.e <1,4> and <2, 11>
-	for(int i = 0; i < valuesInOrder.size(); i++)
+	for (int i = 0; i < valuesInOrder.size(); i++)
 	{
 		counts[i].first = valuesInOrder[i];
 		counts[i].second = 0;
 	}
 
 	// For every value in our board find every variable if its touching and increment its count
-	for(int i = 0; i < valuesInOrder.size(); i++)
+	for (int i = 0; i < valuesInOrder.size(); i++)
 	{
-		for(Variable * v1: network.getNeighborsOfVariable(v))
+		for (Variable *v1 : network.getNeighborsOfVariable(v))
 		{
-			if(v1->getDomain().contains(valuesInOrder[i]))
+			if (v1->getDomain().contains(valuesInOrder[i]))
 			{
 				counts[i].second++;
 			}
@@ -247,15 +249,15 @@ vector<int> BTSolver::getValuesLCVOrder ( Variable* v )
 
 	sort(counts.begin(), counts.end(), sortBySecondItem);
 
-	// Debugging code to print the vector 
+	// Debugging code to print the vector
 	// for(int i = 0; i < counts.size(); i++)
 	// {
-	//     cout << counts[i].first << ": " << counts[i].second << "| "; 
+	//     cout << counts[i].first << ": " << counts[i].second << "| ";
 	// }
 	// cout << endl;
 
 	// Since we need to return a single int array of the numbers put them in the return vector and disregard the counts for the return vector
-	for(int i = 0; i < counts.size(); i++)
+	for (int i = 0; i < counts.size(); i++)
 	{
 		sortedValues[i] = counts[i].first;
 	}
@@ -269,7 +271,7 @@ vector<int> BTSolver::getValuesLCVOrder ( Variable* v )
  * Completing the three tourn heuristic will automatically enter
  * your program into a tournament.
  */
-vector<int> BTSolver::getTournVal ( Variable* v )
+vector<int> BTSolver::getTournVal(Variable *v)
 {
 	return vector<int>();
 }
@@ -278,20 +280,20 @@ vector<int> BTSolver::getTournVal ( Variable* v )
 // Engine Functions
 // =====================================================================
 
-void BTSolver::solve ( void )
+void BTSolver::solve(void)
 {
-	if ( hasSolution )
+	if (hasSolution)
 		return;
 
 	// Variable Selection
-	Variable* v = selectNextVariable();
+	Variable *v = selectNextVariable();
 
-	if ( v == nullptr )
+	if (v == nullptr)
 	{
-		for ( Variable* var : network.getVariables() )
+		for (Variable *var : network.getVariables())
 		{
 			// If all variables haven't been assigned
-			if ( ! ( var->isAssigned() ) )
+			if (!(var->isAssigned()))
 			{
 				cout << "Error" << endl;
 				return;
@@ -304,21 +306,21 @@ void BTSolver::solve ( void )
 	}
 
 	// Attempt to assign a value
-	for ( int i : getNextValues( v ) )
+	for (int i : getNextValues(v))
 	{
 		// Store place in trail and push variable's state on trail
 		trail->placeTrailMarker();
-		trail->push( v );
+		trail->push(v);
 
 		// Assign the value
-		v->assignValue( i );
+		v->assignValue(i);
 
 		// Propagate constraints, check consistency, recurse
-		if ( checkConsistency() )
+		if (checkConsistency())
 			solve();
 
 		// If this assignment succeeded, return
-		if ( hasSolution )
+		if (hasSolution)
 			return;
 
 		// Otherwise backtrack
@@ -326,56 +328,56 @@ void BTSolver::solve ( void )
 	}
 }
 
-bool BTSolver::checkConsistency ( void )
+bool BTSolver::checkConsistency(void)
 {
-	if ( cChecks == "forwardChecking" )
+	if (cChecks == "forwardChecking")
 		return forwardChecking();
 
-	if ( cChecks == "norvigCheck" )
+	if (cChecks == "norvigCheck")
 		return norvigCheck();
 
-	if ( cChecks == "tournCC" )
+	if (cChecks == "tournCC")
 		return getTournCC();
 
 	return assignmentsCheck();
 }
 
-Variable* BTSolver::selectNextVariable ( void )
+Variable *BTSolver::selectNextVariable(void)
 {
-	if ( varHeuristics == "MinimumRemainingValue" )
+	if (varHeuristics == "MinimumRemainingValue")
 		return getMRV();
 
-	if ( varHeuristics == "MRVwithTieBreaker" )
+	if (varHeuristics == "MRVwithTieBreaker")
 		return MRVwithTieBreaker();
 
-	if ( varHeuristics == "tournVar" )
+	if (varHeuristics == "tournVar")
 		return getTournVar();
 
 	return getfirstUnassignedVariable();
 }
 
-vector<int> BTSolver::getNextValues ( Variable* v )
+vector<int> BTSolver::getNextValues(Variable *v)
 {
-	if ( valHeuristics == "LeastConstrainingValue" )
-		return getValuesLCVOrder( v );
+	if (valHeuristics == "LeastConstrainingValue")
+		return getValuesLCVOrder(v);
 
-	if ( valHeuristics == "tournVal" )
-		return getTournVal( v );
+	if (valHeuristics == "tournVal")
+		return getTournVal(v);
 
-	return getValuesInOrder( v );
+	return getValuesInOrder(v);
 }
 
-bool BTSolver::haveSolution ( void )
+bool BTSolver::haveSolution(void)
 {
 	return hasSolution;
 }
 
-SudokuBoard BTSolver::getSolution ( void )
+SudokuBoard BTSolver::getSolution(void)
 {
-	return network.toSudokuBoard ( sudokuGrid.get_p(), sudokuGrid.get_q() );
+	return network.toSudokuBoard(sudokuGrid.get_p(), sudokuGrid.get_q());
 }
 
-ConstraintNetwork BTSolver::getNetwork ( void )
+ConstraintNetwork BTSolver::getNetwork(void)
 {
 	return network;
 }
