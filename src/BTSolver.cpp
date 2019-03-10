@@ -180,7 +180,36 @@ Variable *BTSolver::getMRV(void)
  */
 Variable *BTSolver::MRVwithTieBreaker(void)
 {
-	return nullptr;
+	Variable *mrv = getfirstUnassignedVariable();
+
+	// If there are no unassigned variables, then no work should be done.
+	if (mrv == nullptr)
+		return nullptr;
+	else
+	{
+		double max_constraints = network.getConstraintsContainingVariable(mrv).size();
+
+		// Current minimum domain count in MRV.
+		int minSize = mrv->size();
+
+		for (Variable *var : network.getVariables())
+		{
+			if (var->isAssigned() == false)
+			{
+				if (var->size() == minSize || var->size() < minSize)
+				{
+					// Found new minimum
+					minSize = var->size();
+
+					// Setting the new mrv to be the minimum var
+					mrv = var;
+					max_constraints = network.getConstraintsContainingVariable(mrv).size();
+				}
+			}
+		}
+	}
+
+	return mrv;
 }
 
 /**
