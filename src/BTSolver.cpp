@@ -106,7 +106,70 @@ bool BTSolver::forwardChecking(void)
  */
 bool BTSolver::norvigCheck(void)
 {
-	return false;
+	int numChanges = 0;
+	do
+	{
+		numChanges++;
+
+		// Get all of the constraints that were changed from last move
+		for (Constraint *c : network.getModifiedConstraints())
+		{
+			for (Variable *v : c->vars)
+			{
+				// Only forward check the variables(box) that have been assigned and we can eliminate from its neighbors
+				if (v->isAssigned())
+				{
+					for (Variable *neighbor : network.getNeighborsOfVariable(v))
+					{
+						// Check the domain of the neighbors and if our recently assigned variable is in there
+						if (neighbor->getDomain().contains(v->getAssignment()))
+						{
+							trail->push(neighbor);								 // Add the previous state to the trail so we can backtrack
+							neighbor->removeValueFromDomain(v->getAssignment()); // Remove the assigned variable
+							numChanges = 0;										 // Reset the counter so we have to forward check again
+						}
+					}
+				}
+				else
+				{
+					// Unassigned Var Domain
+					for (int value : v->getDomain())
+					{
+						bool assignable = true;
+
+						// Iterate through neighbor's domain
+						for (Variable *neighbor : network.getNeighborsOfVariable(v))
+						{
+							if (neighbor->getDomain().contains(value))
+							{
+								assignable = false;
+								break;
+							}
+						}
+
+						// If a unit has only one possible place for a value, then put the value there.
+						if (assignable)
+						{
+							trail->push(v);
+							v->assignValue(value);
+							break;
+						}
+					}
+				}
+			}
+		}
+	} while (numChanges == 0);
+
+	// Go through the board to make sure it's consistent and there aren't any empty squares
+	for (Variable *v : network.getVariables())
+	{
+		if (v->getDomain().isEmpty())
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /**
