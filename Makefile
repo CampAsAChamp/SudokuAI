@@ -6,6 +6,8 @@
 #
 #              - make            - compiles the project and places
 #                                  the executable in the bin folder
+#              - clean           - deletes the executable and executable
+#                                  folder
 #
 #              - Don't make changes to this file.
 # ======================================================================
@@ -28,3 +30,6 @@ all: $(SOURCES)
 	@rm -rf $(BIN_DIR)
 	@mkdir -p $(BIN_DIR)
 	@g++ -std=c++0x $(SOURCES) -o $(BIN_DIR)/Sudoku
+
+clean: 
+	@rm -rf $(BIN_DIR)
