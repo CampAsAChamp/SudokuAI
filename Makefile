@@ -27,9 +27,9 @@ BIN_DIR = bin
 SOURCES = $(foreach s, $(RAW_SOURCES), $(SOURCE_DIR)/$(s))
 
 all: $(SOURCES)
-	@rm -rf $(BIN_DIR)
-	@mkdir -p $(BIN_DIR)
-	@g++ -std=c++0x $(SOURCES) -o $(BIN_DIR)/Sudoku
+	rm -rf $(BIN_DIR)
+	mkdir -p $(BIN_DIR)
+	g++ -std=c++0x $(SOURCES) -o $(BIN_DIR)/Sudoku
 
 clean: 
-	@rm -rf $(BIN_DIR)
+	rm -rf $(BIN_DIR)
