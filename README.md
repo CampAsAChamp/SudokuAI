@@ -67,7 +67,7 @@
 
 ### Built With
 
-* [C++](https://isocpp.org)
+[![My Skills](https://skillicons.dev/icons?i=cpp)](https://skillicons.dev)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
